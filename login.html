@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng nhập</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .login-container {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .login-title {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-group input.error {
+            border-color: #e74c3c;
+        }
+
+        .error-message {
+            color: #e74c3c;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            margin-right: 8px;
+        }
+
+        .checkbox-group label {
+            color: #555;
+            cursor: pointer;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .links {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .links a {
+            color: #667eea;
+            text-decoration: none;
+            margin: 0 10px;
+            font-size: 14px;
+        }
+
+        .links a:hover {
+            text-decoration: underline;
+        }
+
+        .general-error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h2 class="login-title">Đăng nhập</h2>
+        
+        <div class="general-error" id="generalError"></div>
+        
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="username">Tên đăng nhập:</label>
+                <input type="text" id="username" name="username">
+                <div class="error-message" id="usernameError"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Mật khẩu:</label>
+                <input type="password" id="password" name="password">
+                <div class="error-message" id="passwordError"></div>
+            </div>
+            
+            <div class="checkbox-group">
+                <input type="checkbox" id="rememberMe" name="rememberMe">
+                <label for="rememberMe">Nhớ tài khoản</label>
+            </div>
+            
+            <button type="submit" class="login-btn">Đăng nhập</button>
+        </form>
+        
+        <div class="links">
+            <a href="/auth/register" id="registerLink">Đăng ký</a>
+            <a href="/auth/forgotpassword" id="forgotPasswordLink">Quên mật khẩu?</a>
+        </div>
+    </div>
+
+    <script>
+        // Kiểm tra unicode characters
+        function hasUnicodeCharacters(str) {
+            return /[^\x00-\x7F]/.test(str);
+        }
+
+        // Hiển thị lỗi
+        function showError(elementId, message, inputId = null) {
+            const errorElement = document.getElementById(elementId);
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+            
+            if (inputId) {
+                document.getElementById(inputId).classList.add('error');
+            }
+        }
+
+        // Ẩn lỗi
+        function hideError(elementId, inputId = null) {
+            const errorElement = document.getElementById(elementId);
+            errorElement.style.display = 'none';
+            
+            if (inputId) {
+                document.getElementById(inputId).classList.remove('error');
+            }
+        }
+
+        // Reset tất cả lỗi
+        function resetErrors() {
+            hideError('generalError');
+            hideError('usernameError', 'username');
+            hideError('passwordError', 'password');
+        }
+
+        // Mô phỏng API call đăng nhập
+        async function authenticateUser(username, password) {
+            // Mô phỏng delay API
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            // Mô phỏng database check
+            const validUsers = {
+                'admin': 'password123',
+                'user1': 'mypassword',
+                'testuser': 'test123'
+            };
+            
+            if (!validUsers.hasOwnProperty(username)) {
+                return { success: false, message: 'sai thông tin đăng nhập' };
+            }
+            
+            if (validUsers[username] !== password) {
+                return { success: false, message: 'sai thông tin đăng nhập' };
+            }
+            
+            return { success: true };
+        }
+
+        // Xử lý đăng nhập
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            resetErrors();
+            
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const rememberMe = document.getElementById('rememberMe').checked;
+            
+            let hasErrors = false;
+            
+            // Kiểm tra điền đầy đủ thông tin
+            if (!username || !password) {
+                showError('generalError', 'điền đầy đủ username và password');
+                if (!username) {
+                    document.getElementById('username').classList.add('error');
+                }
+                if (!password) {
+                    document.getElementById('password').classList.add('error');
+                }
+                hasErrors = true;
+            }
+            
+            // Kiểm tra unicode trong username
+            if (username && hasUnicodeCharacters(username)) {
+                showError('usernameError', 'username không được dùng kí tự unicode', 'username');
+                hasErrors = true;
+            }
+            
+            // Kiểm tra unicode trong password
+            if (password && hasUnicodeCharacters(password)) {
+                showError('passwordError', 'password không được dùng kí tự unicode', 'password');
+                hasErrors = true;
+            }
+            
+            if (hasErrors) {
+                return;
+            }
+            
+            // Thực hiện authentication
+            try {
+                const result = await authenticateUser(username, password);
+                
+                if (result.success) {
+                    // Lưu trạng thái đăng nhập
+                    if (rememberMe) {
+                        localStorage.setItem('isLoggedIn', 'true');
+                        localStorage.setItem('username', username);
+                        localStorage.setItem('rememberMe', 'true');
+                    } else {
+                        sessionStorage.setItem('isLoggedIn', 'true');
+                        sessionStorage.setItem('username', username);
+                    }
+                    
+                    // Điều hướng đến trang home
+                    window.location.href = '/home';
+                } else {
+                    showError('generalError', result.message);
+                }
+            } catch (error) {
+                showError('generalError', 'Có lỗi xảy ra, vui lòng thử lại');
+            }
+        });
+
+        // Xử lý click vào link đăng ký
+        document.getElementById('registerLink').addEventListener('click', function(e) {
+            e.preventDefault();
+            window.location.href = '/auth/register';
+        });
+
+        // Xử lý click vào link quên mật khẩu
+        document.getElementById('forgotPasswordLink').addEventListener('click', function(e) {
+            e.preventDefault();
+            window.location.href = '/auth/forgotpassword';
+        });
+
+        // Kiểm tra trạng thái đăng nhập khi load trang
+        window.addEventListener('load', function() {
+            const isLoggedInLocal = localStorage.getItem('isLoggedIn');
+            const isLoggedInSession = sessionStorage.getItem('isLoggedIn');
+            
+            if (isLoggedInLocal === 'true' || isLoggedInSession === 'true') {
+                window.location.href = '/home';
+            }
+        });
+
+        // Xóa lỗi khi người dùng bắt đầu nhập
+        document.getElementById('username').addEventListener('input', function() {
+            hideError('usernameError', 'username');
+            hideError('generalError');
+        });
+
+        document.getElementById('password').addEventListener('input', function() {
+            hideError('passwordError', 'password');
+            hideError('generalError');
+        });
+    </script>
+</body>
+</html>
